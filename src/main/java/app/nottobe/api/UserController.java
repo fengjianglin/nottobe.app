@@ -50,7 +50,10 @@ public class UserController extends BaseController {
 	public Result<User> wx_login(String code) {
 
 		MiniAppLogin login = MiniAppProvider.login(code);
-		User user = userRepository.findByUnionidOrOpenid(login.getUnionid(), login.getOpenid());
+		User user = StringUtils.isEmpty(login.getUnionid()) ? //
+				userRepository.findByOpenid(login.getOpenid()) : //
+				userRepository.findByUnionid(login.getUnionid());
+
 		if (user == null) {
 			user = new User();
 			user.setOpenid(login.getOpenid());

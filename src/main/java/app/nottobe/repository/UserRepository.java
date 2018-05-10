@@ -12,5 +12,4 @@ public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
 	public User findByOpenid(String openid);
 
-	public User findByUnionidOrOpenid(String unionid, String openid);
 }

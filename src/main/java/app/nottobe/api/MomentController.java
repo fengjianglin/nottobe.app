@@ -59,7 +59,8 @@ public class MomentController extends BaseController {
 	}
 
 	@PostMapping("post_text")
-	public Result<Moment> post_text(HttpServletRequest request, @RequestParam(required = true) String text) {
+	public Result<Moment> post_text(HttpServletRequest request,
+			@RequestParam(required = false, defaultValue = "") String text) {
 		User user = authorized(request);
 		Moment moment = new Moment();
 		moment.setAuthor(user);
@@ -68,36 +69,39 @@ public class MomentController extends BaseController {
 		return Result.getResult(moment);
 	}
 
-	@PostMapping("post_images")
-	public Result<Moment> post_images(HttpServletRequest request,
-			@RequestParam(required = false, defaultValue = "") String text) {
+	@PostMapping("upload_image")
+	public Result<Moment> upload_image(HttpServletRequest request, long moment_id) {
 		User user = authorized(request);
 		MultipartRequest fileRequest = (MultipartRequest) request;
-		List<MultipartFile> files = fileRequest.getFiles("images");
+		List<MultipartFile> files = fileRequest.getFiles("image");
 		if (files == null || files.size() == 0) {
 			return Result.getErrorResult("请上传图片");
 		}
-		Set<Image> images = new HashSet<Image>();
-		for (MultipartFile multipartFile : files) {
-			if (!multipartFile.isEmpty() && multipartFile.getContentType().startsWith("image/")) {
-				String originFilename = multipartFile.getOriginalFilename();
-				String filename = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + originFilename;
-				String filepath = "ntb/" + filename;
-				try {
-					String url = ossUploader.uploadFile(filepath, multipartFile.getInputStream());
-					Image image = new Image();
-					image.setAuthor(user);
-					image.setUrl(url);
-					images.add(image);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		Moment moment = momentRepository.findOne(moment_id);
+		if (moment == null) {
+			return Result.getErrorResult("上传失败");
+		}
+
+		Set<Image> images = moment.getImages();
+		if (images == null) {
+			images = new HashSet<Image>();
+			moment.setImages(images);
+		}
+		MultipartFile multipartFile = files.get(0);
+		if (!multipartFile.isEmpty() && multipartFile.getContentType().startsWith("image/")) {
+			String originFilename = multipartFile.getOriginalFilename();
+			String filename = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + originFilename;
+			String filepath = "ntb/" + filename;
+			try {
+				String url = ossUploader.uploadFile(filepath, multipartFile.getInputStream());
+				Image image = new Image();
+				image.setAuthor(user);
+				image.setUrl(url);
+				images.add(image);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
-		Moment moment = new Moment();
-		moment.setAuthor(user);
-		moment.setText(text);
-		moment.setImages(images);
 		moment = momentRepository.save(moment);
 		return Result.getResult(moment);
 	}
