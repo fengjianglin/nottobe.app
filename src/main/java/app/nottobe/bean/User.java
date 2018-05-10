@@ -5,6 +5,9 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "user")
@@ -27,6 +30,10 @@ public class User extends BaseEntity implements Serializable {
 	// 0: 未授权；1：已授权
 	@Column(name = "status", columnDefinition = "INT default 0")
 	private int status = 0;
+
+	@JsonIgnore
+	@Transient
+	private String sessionKey;
 
 	public String getOpenid() {
 		return openid;
@@ -67,4 +74,13 @@ public class User extends BaseEntity implements Serializable {
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
+
+	public String getSessionKey() {
+		return sessionKey;
+	}
+
+	public void setSessionKey(String sessionKey) {
+		this.sessionKey = sessionKey;
+	}
+
 }

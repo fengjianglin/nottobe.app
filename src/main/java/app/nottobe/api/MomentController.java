@@ -10,6 +10,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +32,8 @@ import app.nottobe.repository.MomentRepository;
 @RequestMapping("moment")
 public class MomentController extends BaseController {
 
+	private static final int PAGE_SIZE = 20;
+
 	@Autowired
 	private OssUploader ossUploader;
 
@@ -36,9 +41,21 @@ public class MomentController extends BaseController {
 	private MomentRepository momentRepository;
 
 	@GetMapping("list")
-	public Result<Iterable<Moment>> list(String code) {
-		Iterable<Moment> iterable = momentRepository.findAll();
-		return Result.getResult(iterable);
+	public Result<Page<Moment>> list(@RequestParam(required = false, defaultValue = "1") int page) {
+		page = (--page) < 0 ? 0 : page;
+		PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
+		Page<Moment> moments = momentRepository.findAll(pageRequest);
+		return Result.getResult(moments);
+	}
+
+	@GetMapping("mylist")
+	public Result<Page<Moment>> mylist(HttpServletRequest request,
+			@RequestParam(required = false, defaultValue = "1") int page) {
+		User user = authorized(request);
+		page = (--page) < 0 ? 0 : page;
+		PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
+		Page<Moment> moments = momentRepository.findByAuthor(user, pageRequest);
+		return Result.getResult(moments);
 	}
 
 	@PostMapping("post_text")
