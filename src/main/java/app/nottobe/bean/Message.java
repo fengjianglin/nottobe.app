@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -30,7 +31,8 @@ public class Message extends BaseEntity implements Serializable {
 	@JoinColumn(name = "to_user_id", foreignKey = @ForeignKey(name = "FK_to_user_id_in_message"))
 	private User toUser;
 
-	@Column(name = "text", nullable = false)
+	@Lob
+	@Column(name = "text", columnDefinition = "TEXT")
 	private String text;
 
 	public Moment getMoment() {

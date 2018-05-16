@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,7 +24,8 @@ public class Moment extends BaseEntity implements Serializable {
 	@JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "FK_author_id_in_moment"))
 	private User author;
 
-	@Column(name = "text")
+	@Lob
+	@Column(name = "text", columnDefinition = "TEXT")
 	private String text;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
