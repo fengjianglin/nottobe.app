@@ -118,4 +118,29 @@ public class UserController extends BaseController {
 		return Result.getResult(true);
 	}
 
+	@GetMapping("unfollow")
+	public Result<Boolean> unfollow(HttpServletRequest request, long id) {
+		User user = authorized(request);
+		User user2 = userRepository.findOne(id);
+		if (user2 == null) {
+			return Result.getErrorResult("参数错误");
+		}
+		if (!followRepository.existsByFollowerAndFollowing(user, user2)) {
+			return Result.getErrorResult("没有关注");
+		}
+		followRepository.deleteByFollowerAndFollowing(user, user2);
+		return Result.getResult(true);
+	}
+
+	@GetMapping("isfollowing")
+	public Result<Boolean> isFollowing(HttpServletRequest request, long id) {
+		User user = authorized(request);
+		User user2 = userRepository.findOne(id);
+		if (user2 == null) {
+			return Result.getErrorResult("参数错误");
+		}
+		boolean b = followRepository.existsByFollowerAndFollowing(user, user2);
+		return Result.getResult(b);
+	}
+
 }

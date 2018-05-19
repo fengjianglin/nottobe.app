@@ -16,4 +16,6 @@ public interface FollowRepository extends PagingAndSortingRepository<Follow, Lon
 	int countByFollowing(User following);
 
 	boolean existsByFollowerAndFollowing(User follower, User following);
+
+	void deleteByFollowerAndFollowing(User follower, User following);
 }
