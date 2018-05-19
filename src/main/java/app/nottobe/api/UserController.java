@@ -2,22 +2,27 @@ package app.nottobe.api;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
+import app.nottobe.bean.Follow;
 import app.nottobe.bean.User;
 import app.nottobe.component.MiniAppProvider;
 import app.nottobe.component.SessionService;
 import app.nottobe.entity.MiniAppAuthorize;
 import app.nottobe.entity.MiniAppLogin;
 import app.nottobe.entity.Result;
+import app.nottobe.repository.FollowRepository;
 import app.nottobe.repository.UserRepository;
 import app.nottobe.utils.DefaultUniqueIdGenerator;
 import app.nottobe.utils.SecurityUtil;
@@ -25,8 +30,6 @@ import app.nottobe.utils.SecurityUtil;
 @RestController
 @RequestMapping("user")
 public class UserController extends BaseController {
-
-	private static Logger logger = Logger.getLogger(UserController.class);
 
 	@Autowired
 	private DefaultUniqueIdGenerator uniqueIdGenerator;
@@ -38,13 +41,10 @@ public class UserController extends BaseController {
 	private UserRepository userRepository;
 
 	@Autowired
-	private SessionService sessionService;
+	private FollowRepository followRepository;
 
-	@RequestMapping("test")
-	public Result<User> test() {
-		logger.debug("test");
-		return Result.getResult(new User());
-	}
+	@Autowired
+	private SessionService sessionService;
 
 	@GetMapping("login")
 	public Result<User> wx_login(String code) {
@@ -90,4 +90,32 @@ public class UserController extends BaseController {
 		user = userRepository.save(user);
 		return Result.getResult(user);
 	}
+
+	@GetMapping("list")
+	public Result<Page<User>> list(@RequestParam(required = false, defaultValue = "1") int page) {
+		page = (--page) < 0 ? 0 : page;
+		PageRequest pageRequest = new PageRequest(page, 20, Sort.Direction.DESC, "id");
+		Page<User> users = userRepository.findAll(pageRequest);
+		return Result.getResult(users);
+	}
+
+	@GetMapping("follow")
+	public Result<Boolean> follow(HttpServletRequest request, long id) {
+		User user = authorized(request);
+		User user2 = userRepository.findOne(id);
+		if (user2 == null) {
+			return Result.getErrorResult("参数错误");
+		}
+
+		if (followRepository.existsByFollowerAndFollowing(user, user2)) {
+			return Result.getErrorResult("已经关注");
+		}
+
+		Follow follow = new Follow();
+		follow.setFollower(user);
+		follow.setFollowing(user2);
+		followRepository.save(follow);
+		return Result.getResult(true);
+	}
+
 }
