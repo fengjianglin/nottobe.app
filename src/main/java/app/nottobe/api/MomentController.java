@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,11 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import app.nottobe.bean.Follow;
 import app.nottobe.bean.Image;
 import app.nottobe.bean.Moment;
 import app.nottobe.bean.User;
 import app.nottobe.component.OssUploader;
 import app.nottobe.entity.Result;
+import app.nottobe.repository.FollowRepository;
 import app.nottobe.repository.MomentRepository;
 
 @RestController
@@ -40,11 +43,27 @@ public class MomentController extends BaseController {
 	@Autowired
 	private MomentRepository momentRepository;
 
+	@Autowired
+	private FollowRepository followRepository;
+
 	@GetMapping("list")
 	public Result<Page<Moment>> list(@RequestParam(required = false, defaultValue = "1") int page) {
 		page = (--page) < 0 ? 0 : page;
 		PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
 		Page<Moment> moments = momentRepository.findAll(pageRequest);
+		return Result.getResult(moments);
+	}
+
+	@GetMapping("followingslist")
+	public Result<Page<Moment>> followingslist(HttpServletRequest request,
+			@RequestParam(required = false, defaultValue = "1") int page) {
+		User user = authorized(request);
+		List<User> users = followRepository.findByFollower(user).stream().map(Follow::getFollowing)
+				.collect(Collectors.toList());
+		users.add(user);
+		page = (--page) < 0 ? 0 : page;
+		PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
+		Page<Moment> moments = momentRepository.findByAuthorIn(users, pageRequest);
 		return Result.getResult(moments);
 	}
 

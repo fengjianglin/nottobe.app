@@ -1,5 +1,7 @@
 package app.nottobe.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -12,6 +14,6 @@ import app.nottobe.bean.User;
 public interface MomentRepository extends PagingAndSortingRepository<Moment, Long> {
 
 	Page<Moment> findByAuthor(User author, Pageable page);
-	
-//	Page<Moment> find( Pageable page);
+
+	Page<Moment> findByAuthorIn(List<User> authors, Pageable page);
 }

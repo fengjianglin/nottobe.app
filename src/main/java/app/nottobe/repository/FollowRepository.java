@@ -1,7 +1,10 @@
 package app.nottobe.repository;
 
+import java.util.List;
+
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import app.nottobe.bean.Follow;
 import app.nottobe.bean.User;
@@ -17,5 +20,8 @@ public interface FollowRepository extends PagingAndSortingRepository<Follow, Lon
 
 	boolean existsByFollowerAndFollowing(User follower, User following);
 
+	@Transactional
 	void deleteByFollowerAndFollowing(User follower, User following);
+	
+	List<Follow> findByFollower(User follower);
 }
