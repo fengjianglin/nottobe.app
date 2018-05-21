@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "up")
-public class Up extends BaseEntity implements Serializable {
+public class Up extends BaseEntity implements Serializable, Comparable<Up> {
 
 	private static final long serialVersionUID = -7788674364016561527L;
 
@@ -39,5 +39,10 @@ public class Up extends BaseEntity implements Serializable {
 
 	public void setAuthor(User author) {
 		this.author = author;
+	}
+
+	@Override
+	public int compareTo(Up o) {
+		return (int) (this.getId() - o.getId());
 	}
 }

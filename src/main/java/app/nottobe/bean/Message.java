@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "message")
-public class Message extends BaseEntity implements Serializable {
+public class Message extends BaseEntity implements Serializable, Comparable<Message> {
 
 	private static final long serialVersionUID = -7788674364016561527L;
 
@@ -67,4 +67,8 @@ public class Message extends BaseEntity implements Serializable {
 		this.text = text;
 	}
 
+	@Override
+	public int compareTo(Message o) {
+		return (int) (this.getId() - o.getId());
+	}
 }

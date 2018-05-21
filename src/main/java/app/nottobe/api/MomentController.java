@@ -2,10 +2,9 @@ package app.nottobe.api;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -101,9 +100,9 @@ public class MomentController extends BaseController {
 			return Result.getErrorResult("上传失败");
 		}
 
-		Set<Image> images = moment.getImages();
+		List<Image> images = moment.getImages();
 		if (images == null) {
-			images = new HashSet<Image>();
+			images = new ArrayList<Image>();
 			moment.setImages(images);
 		}
 		MultipartFile multipartFile = files.get(0);

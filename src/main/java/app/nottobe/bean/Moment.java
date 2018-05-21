@@ -1,7 +1,7 @@
 package app.nottobe.bean;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,17 +28,17 @@ public class Moment extends BaseEntity implements Serializable {
 	@Column(name = "text", columnDefinition = "TEXT")
 	private String text;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "moment_id")
-	private Set<Image> images;
+	private List<Image> images;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "moment_id")
-	private Set<Up> ups;
+	private List<Up> ups;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "moment_id")
-	private Set<Message> messages;
+	private List<Message> messages;
 
 	@Column(name = "status", columnDefinition = "INT default 0")
 	private int status = 0;
@@ -59,27 +59,27 @@ public class Moment extends BaseEntity implements Serializable {
 		this.text = text;
 	}
 
-	public Set<Image> getImages() {
+	public List<Image> getImages() {
 		return images;
 	}
 
-	public void setImages(Set<Image> images) {
+	public void setImages(List<Image> images) {
 		this.images = images;
 	}
 
-	public Set<Up> getUps() {
+	public List<Up> getUps() {
 		return ups;
 	}
 
-	public void setUps(Set<Up> ups) {
+	public void setUps(List<Up> ups) {
 		this.ups = ups;
 	}
 
-	public Set<Message> getMessages() {
+	public List<Message> getMessages() {
 		return messages;
 	}
 
-	public void setMessages(Set<Message> messages) {
+	public void setMessages(List<Message> messages) {
 		this.messages = messages;
 	}
 

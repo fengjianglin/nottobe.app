@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "image")
-public class Image extends BaseEntity implements Serializable {
+public class Image extends BaseEntity implements Serializable, Comparable<Image> {
 
 	private static final long serialVersionUID = -7788674364016561527L;
 
@@ -52,6 +52,11 @@ public class Image extends BaseEntity implements Serializable {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	@Override
+	public int compareTo(Image o) {
+		return (int) (this.getId() - o.getId());
 	}
 
 }
