@@ -105,7 +105,7 @@ public class UserController extends BaseController {
 	public Result<Page<User>> list(@RequestParam(required = false, defaultValue = "1") int page) {
 		page = (--page) < 0 ? 0 : page;
 		PageRequest pageRequest = new PageRequest(page, 20, Sort.Direction.DESC, "id");
-		Page<User> users = userRepository.findAll(pageRequest);
+		Page<User> users = userRepository.findByStatus(1, pageRequest);
 		return Result.getResult(users);
 	}
 
