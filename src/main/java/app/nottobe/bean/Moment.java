@@ -38,7 +38,7 @@ public class Moment extends BaseEntity implements Serializable {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "moment_id")
-	private List<Message> messages;
+	private List<Comment> comments;
 
 	@Column(name = "status", columnDefinition = "INT default 0")
 	private int status = 0;
@@ -75,12 +75,12 @@ public class Moment extends BaseEntity implements Serializable {
 		this.ups = ups;
 	}
 
-	public List<Message> getMessages() {
-		return messages;
+	public List<Comment> getComments() {
+		return comments;
 	}
 
-	public void setMessages(List<Message> messages) {
-		this.messages = messages;
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
 	}
 
 	public int getStatus() {

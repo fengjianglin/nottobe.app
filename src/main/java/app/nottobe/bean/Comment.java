@@ -13,8 +13,8 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "message")
-public class Message extends BaseEntity implements Serializable, Comparable<Message> {
+@Table(name = "comment")
+public class Comment extends BaseEntity implements Serializable, Comparable<Comment> {
 
 	private static final long serialVersionUID = -7788674364016561527L;
 
@@ -68,7 +68,7 @@ public class Message extends BaseEntity implements Serializable, Comparable<Mess
 	}
 
 	@Override
-	public int compareTo(Message o) {
+	public int compareTo(Comment o) {
 		return (int) (this.getId() - o.getId());
 	}
 }
