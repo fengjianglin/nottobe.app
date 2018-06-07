@@ -59,16 +59,6 @@ public class UserController extends BaseController {
 			user.setOpenid(login.getOpenid());
 			user.setUnionid(login.getUnionid());
 			user = userRepository.save(user);
-
-			{ // 默认关注月子弯弯
-				User yzww = userRepository.findOne(1L);
-				if (!followRepository.existsByFollowerAndFollowing(user, yzww)) {
-					Follow follow = new Follow();
-					follow.setFollower(user);
-					follow.setFollowing(yzww);
-					followRepository.save(follow);
-				}
-			}
 		}
 		user.setSessionKey(login.getSession_key());
 

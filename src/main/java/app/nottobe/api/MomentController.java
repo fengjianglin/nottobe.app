@@ -77,7 +77,11 @@ public class MomentController extends BaseController {
 		page = (--page) < 0 ? 0 : page;
 		PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
 		Page<Moment> moments = momentRepository.findByAuthorIn(users, pageRequest);
-		return Result.getResult(moments);
+		if (page == 0 && !moments.hasContent()) {
+			return list(0);
+		} else {
+			return Result.getResult(moments);
+		}
 	}
 
 	@GetMapping("mylist")
