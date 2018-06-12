@@ -94,6 +94,16 @@ public class MomentController extends BaseController {
 		return Result.getResult(moments);
 	}
 
+	@GetMapping("someonelist")
+	public Result<Page<Moment>> someonelist(@RequestParam(required = true) long id,
+			@RequestParam(required = false, defaultValue = "1") int page) {
+		User user = userRepository.findOne(id);
+		page = (--page) < 0 ? 0 : page;
+		PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
+		Page<Moment> moments = momentRepository.findByAuthor(user, pageRequest);
+		return Result.getResult(moments);
+	}
+
 	@PostMapping("post_text")
 	public Result<Moment> post_text(HttpServletRequest request,
 			@RequestParam(required = false, defaultValue = "") String text) {

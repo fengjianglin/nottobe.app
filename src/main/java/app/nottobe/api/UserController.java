@@ -1,5 +1,8 @@
 package app.nottobe.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +144,39 @@ public class UserController extends BaseController {
 		}
 		boolean b = followRepository.existsByFollowerAndFollowing(user, user2);
 		return Result.getResult(b);
+	}
+
+	@GetMapping("get")
+	public Result<User> get(long id) {
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			// 关注数
+			int followings = followRepository.countByFollower(user);
+			// 粉丝数
+			int followers = followRepository.countByFollowing(user);
+			user.setFollowings(followings);
+			user.setFollowers(followers);
+			return Result.getResult(user);
+		}
+		return Result.getErrorResult("请求错误");
+	}
+
+	@GetMapping("follows_num")
+	public Result<Map<String, Integer>> follows_num(long id) {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			// 关注数
+			int followings = followRepository.countByFollower(user);
+			// 粉丝数
+			int followers = followRepository.countByFollowing(user);
+			map.put("followings", followings);
+			map.put("followers", followers);
+			return Result.getResult(map);
+		}
+		map.put("followings", 0);
+		map.put("followers", 0);
+		return Result.getResult(map);
 	}
 
 }

@@ -35,6 +35,14 @@ public class User extends BaseEntity implements Serializable {
 	@Transient
 	private String sessionKey;
 
+	// 关注数
+	@Transient
+	private int followings = 0;
+
+	// 粉丝数
+	@Transient
+	private int followers = 0;
+
 	public String getOpenid() {
 		return openid;
 	}
@@ -81,6 +89,22 @@ public class User extends BaseEntity implements Serializable {
 
 	public void setSessionKey(String sessionKey) {
 		this.sessionKey = sessionKey;
+	}
+
+	public int getFollowings() {
+		return followings;
+	}
+
+	public void setFollowings(int followings) {
+		this.followings = followings;
+	}
+
+	public int getFollowers() {
+		return followers;
+	}
+
+	public void setFollowers(int followers) {
+		this.followers = followers;
 	}
 
 }
