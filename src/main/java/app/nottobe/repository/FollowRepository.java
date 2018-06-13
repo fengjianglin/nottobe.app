@@ -2,6 +2,8 @@ package app.nottobe.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,13 @@ public interface FollowRepository extends PagingAndSortingRepository<Follow, Lon
 
 	@Transactional
 	void deleteByFollowerAndFollowing(User follower, User following);
-	
+
+	// 某人的关注列表
 	List<Follow> findByFollower(User follower);
+
+	// 某人的关注列表 ： 分页
+	Page<Follow> findByFollower(User follower, Pageable page);
+
+	// 某人的粉丝列表 ： 分页
+	Page<Follow> findByFollowing(User following, Pageable page);
 }

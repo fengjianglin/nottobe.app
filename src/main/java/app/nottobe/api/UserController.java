@@ -34,6 +34,8 @@ import app.nottobe.utils.SecurityUtil;
 @RequestMapping("user")
 public class UserController extends BaseController {
 
+	private static final int PAGE_SIZE = 20;
+
 	@Autowired
 	private DefaultUniqueIdGenerator uniqueIdGenerator;
 
@@ -177,6 +179,30 @@ public class UserController extends BaseController {
 		map.put("followings", 0);
 		map.put("followers", 0);
 		return Result.getResult(map);
+	}
+
+	@GetMapping("followings")
+	public Result<Page<Follow>> followings(long id, @RequestParam(required = false, defaultValue = "1") int page) {
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			page = (--page) < 0 ? 0 : page;
+			PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
+			Page<Follow> followings = followRepository.findByFollower(user, pageRequest);
+			return Result.getResult(followings);
+		}
+		return Result.getErrorResult("请求失败");
+	}
+
+	@GetMapping("followers")
+	public Result<Page<Follow>> followers(long id, @RequestParam(required = false, defaultValue = "1") int page) {
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			page = (--page) < 0 ? 0 : page;
+			PageRequest pageRequest = new PageRequest(page, PAGE_SIZE, Sort.Direction.DESC, "id");
+			Page<Follow> followers = followRepository.findByFollowing(user, pageRequest);
+			return Result.getResult(followers);
+		}
+		return Result.getErrorResult("请求失败");
 	}
 
 }
