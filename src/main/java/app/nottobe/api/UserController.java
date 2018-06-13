@@ -1,26 +1,49 @@
 package app.nottobe.api;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 
 import app.nottobe.bean.Follow;
 import app.nottobe.bean.User;
 import app.nottobe.component.MiniAppProvider;
+import app.nottobe.component.OssUploader;
 import app.nottobe.component.SessionService;
 import app.nottobe.entity.MiniAppAuthorize;
 import app.nottobe.entity.MiniAppLogin;
@@ -40,6 +63,9 @@ public class UserController extends BaseController {
 	private DefaultUniqueIdGenerator uniqueIdGenerator;
 
 	@Autowired
+	private OssUploader ossUploader;
+
+	@Autowired
 	private MiniAppProvider MiniAppProvider;
 
 	@Autowired
@@ -50,6 +76,9 @@ public class UserController extends BaseController {
 
 	@Autowired
 	private SessionService sessionService;
+
+	@Autowired
+	private RestTemplate restTemplate;
 
 	@GetMapping("login")
 	public Result<User> wx_login(String code) {
@@ -203,6 +232,119 @@ public class UserController extends BaseController {
 			return Result.getResult(followers);
 		}
 		return Result.getErrorResult("请求失败");
+	}
+
+	@GetMapping(value = "/hb/{id}.png")
+	public void generateMinaUserHaibao(HttpServletResponse resp, @PathVariable long id) throws IOException {
+		BufferedImage hb = ossUploader.randomUserHaiBaoMoban();
+		byte[] bytes = restTemplate.getForObject("http://www.manlanvideo.com/ntb/ntbqr.jpg", byte[].class);
+		BufferedImage qr = ImageIO.read(new ByteArrayInputStream(bytes));
+		drawQr(hb, qr);
+		User user = userRepository.findOne(id);
+		if (user != null) {
+			String avatar = user.getAvatar();
+			String nickname = user.getNickname();
+			BufferedImage originAvatar = null;
+			if (isHttpProtocol(avatar)) {
+				HttpHeaders headers = new HttpHeaders();
+				headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+				HttpEntity<String> entity = new HttpEntity<String>(headers);
+				ResponseEntity<byte[]> response = restTemplate.exchange(user.getAvatar(), HttpMethod.GET, entity,
+						byte[].class);
+				originAvatar = ImageIO.read(new ByteArrayInputStream(response.getBody()));// 获取用户头像图片
+			} else {
+				originAvatar = ImageIO.read(this.getClass().getResourceAsStream("/avatar_default.png"));
+			}
+			drawAvatarAndNickname(hb, originAvatar, nickname);
+		}
+		resp.setContentType("image/png");
+		OutputStream os = resp.getOutputStream();
+		ImageIO.write(hb, "png", os);
+	}
+
+	// 绘制用户二维码
+	private void drawQr(BufferedImage hb, BufferedImage qr) {
+		int hb_width = hb.getWidth();
+		int hb_height = hb.getHeight();
+		int qr_size = hb_width / 6;
+		int qr_x = (int) (hb_width - qr_size * 1.1);
+		int qr_y = (int) (hb_height - qr_size * 1.1);
+		qr = scale(qr, qr_size, qr_size);
+		Graphics2D g2d = hb.createGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.drawImage(circle(qr), qr_x, qr_y, null);
+		g2d.dispose();
+	}
+
+	// 绘制用户头像和昵称
+	private void drawAvatarAndNickname(BufferedImage hb, BufferedImage avatar, String nickname) {
+		int hb_width = hb.getWidth();
+		int a_size = hb_width / 6;
+		int a_x = (int) (a_size * 0.1);
+		int a_y = (int) (a_size * 0.1);
+
+		Graphics2D g2d = hb.createGraphics();
+
+		avatar = scale(avatar, a_size, a_size);
+		g2d.drawImage(circle(avatar), a_x, a_y, null);
+
+		int name_size = a_size / 3;
+		int name_x = (int) (a_size * 1.2);
+		int name_y = (int) (a_size * 2.2 / 3);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Font font = new Font(null, Font.BOLD, name_size);
+		g2d.setColor(Color.BLACK);
+		g2d.setFont(font);
+		g2d.drawString(nickname, name_x - 1, name_y - 1);
+
+		font = new Font(null, Font.BOLD, name_size);
+		g2d.setColor(Color.WHITE);
+		g2d.setFont(font);
+		g2d.drawString(nickname, name_x + 1, name_y + 1);
+		g2d.dispose();
+	}
+
+	private boolean isHttpProtocol(String url) {
+		if (url == null || url.length() == 0 || url.equalsIgnoreCase("null")) {
+			return false;
+		}
+		if (!url.toLowerCase().startsWith("http://") && !url.toLowerCase().startsWith("https://")) {
+			return false;
+		}
+		return true;
+	}
+
+	private BufferedImage scale(BufferedImage srcImage, int width, int height) {
+		Image image = srcImage.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+		BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics g = scaledImage.getGraphics();
+		g.drawImage(image, 0, 0, null); // 绘制缩小后的图
+		g.dispose();
+		return scaledImage;
+	}
+
+	/**
+	 * 生成圆角图标
+	 * 
+	 * @param image
+	 * @param cornerRadius
+	 *            圆角半径
+	 * @return
+	 */
+	private BufferedImage circle(BufferedImage image) {
+		int oW = image.getWidth();
+		int oH = image.getHeight();
+		BufferedImage output = new BufferedImage((int) oW, (int) oH, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = output.createGraphics();
+		g2.setComposite(AlphaComposite.Src);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setColor(Color.WHITE);
+		g2.fill(new RoundRectangle2D.Float(0, 0, oW, oH, oW, oH));
+		g2.setComposite(AlphaComposite.SrcAtop);
+		g2.drawImage(image, 0, 0, null);
+		g2.dispose();
+		return output;
 	}
 
 }

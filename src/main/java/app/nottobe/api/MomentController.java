@@ -137,7 +137,7 @@ public class MomentController extends BaseController {
 		if (!multipartFile.isEmpty() && multipartFile.getContentType().startsWith("image/")) {
 			String originFilename = multipartFile.getOriginalFilename();
 			String filename = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + originFilename;
-			String filepath = "ntb/" + filename;
+			String filepath = "ntb/moments/" + filename;
 			try {
 				String url = ossUploader.uploadFile(filepath, multipartFile.getInputStream());
 				Image image = new Image();
