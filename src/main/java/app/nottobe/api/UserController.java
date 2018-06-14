@@ -266,10 +266,13 @@ public class UserController extends BaseController {
 	private void drawQr(BufferedImage hb, BufferedImage qr) {
 		int hb_width = hb.getWidth();
 		int hb_height = hb.getHeight();
-		int qr_size = hb_width / 6;
+		int qr_size = 256;
+		if (hb_width < 1024 || hb_height < 1024) {
+			qr_size = 128;
+			qr = scale(qr, qr_size, qr_size);
+		}
 		int qr_x = (int) (hb_width - qr_size * 1.1);
 		int qr_y = (int) (hb_height - qr_size * 1.1);
-		qr = scale(qr, qr_size, qr_size);
 		Graphics2D g2d = hb.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.drawImage(circle(qr), qr_x, qr_y, null);
@@ -278,8 +281,10 @@ public class UserController extends BaseController {
 
 	// 绘制用户头像和昵称
 	private void drawAvatarAndNickname(BufferedImage hb, BufferedImage avatar, String nickname) {
-		int hb_width = hb.getWidth();
-		int a_size = hb_width / 6;
+		int a_size = 256;
+		if (hb.getWidth() < 1024 || hb.getHeight() < 1024) {
+			a_size = 128;
+		}
 		int a_x = (int) (a_size * 0.1);
 		int a_y = (int) (a_size * 0.1);
 
