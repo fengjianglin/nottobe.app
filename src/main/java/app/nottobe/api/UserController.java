@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,11 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -235,8 +229,8 @@ public class UserController extends BaseController {
 	}
 
 	@GetMapping(value = "/hb/{id}.png")
-	public void generateMinaUserHaibao(HttpServletResponse resp, @PathVariable long id) throws IOException {
-		BufferedImage hb = ossUploader.randomUserHaiBaoMoban();
+	public void haibao(HttpServletResponse resp, @PathVariable long id) throws IOException {
+		BufferedImage hb = ossUploader.randomUserHB();
 		byte[] bytes = restTemplate.getForObject("http://www.manlanvideo.com/ntb/ntbqr.jpg", byte[].class);
 		BufferedImage qr = ImageIO.read(new ByteArrayInputStream(bytes));
 		drawQr(hb, qr);
@@ -246,12 +240,8 @@ public class UserController extends BaseController {
 			String nickname = user.getNickname();
 			BufferedImage originAvatar = null;
 			if (isHttpProtocol(avatar)) {
-				HttpHeaders headers = new HttpHeaders();
-				headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
-				HttpEntity<String> entity = new HttpEntity<String>(headers);
-				ResponseEntity<byte[]> response = restTemplate.exchange(user.getAvatar(), HttpMethod.GET, entity,
-						byte[].class);
-				originAvatar = ImageIO.read(new ByteArrayInputStream(response.getBody()));// 获取用户头像图片
+				byte[] bytes2 = restTemplate.getForObject(user.getAvatar(), byte[].class);
+				originAvatar = ImageIO.read(new ByteArrayInputStream(bytes2));// 获取用户头像图片
 			} else {
 				originAvatar = ImageIO.read(this.getClass().getResourceAsStream("/avatar_default.png"));
 			}

@@ -40,7 +40,7 @@ public class OssUploader {
 		return ossHost + "/" + filepath;
 	}
 
-	public BufferedImage randomUserHaiBaoMoban() throws IOException {
+	public BufferedImage randomUserHB() throws IOException {
 		String userHB = "ntb/hb";
 		OSSClient client = getClient();
 		ObjectListing objList = client.listObjects(bucketName, userHB);

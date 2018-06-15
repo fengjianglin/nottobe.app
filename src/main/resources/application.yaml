@@ -31,6 +31,7 @@ spring.redis.database: 0
 session.expire.days: 30
 
 # aliyun oss
-oss.endpoint: oss-cn-beijing.aliyuncs.com
+# oss.endpoint: oss-cn-beijing.aliyuncs.com
+oss.endpoint: oss-cn-beijing-internal.aliyuncs.com
 oss.host: http://s.manlanvideo.com
 oss.bucketName: manlan
