@@ -2,8 +2,12 @@
 logging.level.app.nottobe: DEBUG
 logging.file: logs/nottobe.log
 
-server.port: 80
+server.port: 7000
 spring.mvc.favicon.enabled: false
+
+web.static-location: /data/static/
+spring.mvc.static-path-pattern: /**
+spring.resources.static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.static-location}
 
 #thymeleaf start
 spring.thymeleaf.mode: HTML5
@@ -31,7 +35,7 @@ spring.redis.database: 0
 session.expire.days: 30
 
 # aliyun oss
-# oss.endpoint: oss-cn-beijing.aliyuncs.com
-oss.endpoint: oss-cn-beijing-internal.aliyuncs.com
+oss.endpoint: oss-cn-beijing.aliyuncs.com
+# oss.endpoint: oss-cn-beijing-internal.aliyuncs.com
 oss.host: http://s.manlanvideo.com
 oss.bucketName: manlan
