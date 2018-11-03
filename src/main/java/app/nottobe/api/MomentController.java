@@ -27,7 +27,7 @@ import app.nottobe.bean.Image;
 import app.nottobe.bean.Moment;
 import app.nottobe.bean.Up;
 import app.nottobe.bean.User;
-import app.nottobe.component.OssUploader;
+import app.nottobe.component.FileUploader;
 import app.nottobe.entity.Result;
 import app.nottobe.repository.CommentRepository;
 import app.nottobe.repository.FollowRepository;
@@ -42,7 +42,7 @@ public class MomentController extends BaseController {
 	private static final int PAGE_SIZE = 20;
 
 	@Autowired
-	private OssUploader ossUploader;
+	private FileUploader fileUploader;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -139,7 +139,7 @@ public class MomentController extends BaseController {
 			String filename = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + originFilename;
 			String filepath = "ntb/moments/" + filename;
 			try {
-				String url = ossUploader.uploadFile(filepath, multipartFile.getInputStream());
+				String url = fileUploader.uploadFile(filepath, multipartFile);
 				Image image = new Image();
 				image.setAuthor(user);
 				image.setUrl(url);

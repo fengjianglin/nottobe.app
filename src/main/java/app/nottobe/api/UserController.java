@@ -37,7 +37,7 @@ import com.google.gson.Gson;
 import app.nottobe.bean.Follow;
 import app.nottobe.bean.User;
 import app.nottobe.component.MiniAppProvider;
-import app.nottobe.component.OssUploader;
+import app.nottobe.component.FileUploader;
 import app.nottobe.component.SessionService;
 import app.nottobe.entity.MiniAppAuthorize;
 import app.nottobe.entity.MiniAppLogin;
@@ -57,7 +57,7 @@ public class UserController extends BaseController {
 	private DefaultUniqueIdGenerator uniqueIdGenerator;
 
 	@Autowired
-	private OssUploader ossUploader;
+	private FileUploader fileUploader;
 
 	@Autowired
 	private MiniAppProvider MiniAppProvider;
@@ -230,7 +230,7 @@ public class UserController extends BaseController {
 
 	@GetMapping(value = "/hb/{id}.png")
 	public void haibao(HttpServletResponse resp, @PathVariable long id) throws IOException {
-		BufferedImage hb = ossUploader.randomUserHB();
+		BufferedImage hb = fileUploader.randomUserHB();
 		byte[] bytes = restTemplate.getForObject("http://www.manlanvideo.com/ntb/ntbqr.jpg", byte[].class);
 		BufferedImage qr = ImageIO.read(new ByteArrayInputStream(bytes));
 		drawQr(hb, qr);
@@ -323,8 +323,7 @@ public class UserController extends BaseController {
 	 * 生成圆角图标
 	 * 
 	 * @param image
-	 * @param cornerRadius
-	 *            圆角半径
+	 * @param cornerRadius 圆角半径
 	 * @return
 	 */
 	private BufferedImage circle(BufferedImage image) {
