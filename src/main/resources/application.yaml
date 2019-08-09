@@ -6,7 +6,7 @@ server.host: ntb.xxicp.cn
 server.port: 7000
 spring.mvc.favicon.enabled: false
 
-web.static-location: /data/static/
+web.static-location: /web/notbe/static/
 spring:
   mvc:
     static-path-pattern: /**
@@ -33,11 +33,6 @@ spring.datasource.password: Abc1234567!
 spring.datasource.tomcat.initSQL: "SET NAMES 'utf8mb4'"
 spring.jpa.properties.hibernate.hbm2ddl.auto: update
 spring.jpa.properties.hibernate.show_sql: true
-
-# redis
-spring.redis.host: 106.12.207.243
-spring.redis.port: 6379
-spring.redis.password: 
 
 # session
 session.expire.days: 30
