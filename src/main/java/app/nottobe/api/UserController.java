@@ -36,8 +36,8 @@ import com.google.gson.Gson;
 
 import app.nottobe.bean.Follow;
 import app.nottobe.bean.User;
-import app.nottobe.component.MiniAppProvider;
 import app.nottobe.component.FileUploader;
+import app.nottobe.component.MiniAppProvider;
 import app.nottobe.component.SessionService;
 import app.nottobe.entity.MiniAppAuthorize;
 import app.nottobe.entity.MiniAppLogin;
@@ -231,7 +231,7 @@ public class UserController extends BaseController {
 	@GetMapping(value = "/hb/{id}.png")
 	public void haibao(HttpServletResponse resp, @PathVariable long id) throws IOException {
 		BufferedImage hb = fileUploader.randomUserHB();
-		byte[] bytes = restTemplate.getForObject("http://www.manlanvideo.com/ntb/ntbqr.jpg", byte[].class);
+		byte[] bytes = restTemplate.getForObject("https://ntb.xxicp.cn/erweima.png", byte[].class);
 		BufferedImage qr = ImageIO.read(new ByteArrayInputStream(bytes));
 		drawQr(hb, qr);
 		User user = userRepository.findOne(id);
